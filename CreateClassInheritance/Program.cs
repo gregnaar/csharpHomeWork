@@ -10,18 +10,12 @@ namespace CreateClass
     {
         static void Main(string[] args)
         {
-            Person me = new Person();
-            me.BirthDate = DateTime.Parse("1987.11.16");
-            me.Name = "Adam";
-            me.Age = (DateTime.Now.DayOfYear >= me.BirthDate.DayOfYear) ? DateTime.Now.Year - me.BirthDate.Year : (DateTime.Now.Year - me.BirthDate.Year) - 1;
-            me.Gender = Person.Genders.Man;
-            Console.WriteLine(me.ToString());
-
-            Room myRoom = new Room() { RoomNumber = 1 };
-
-            Employee adam = new Employee("Adam", "1987.11.16", Person.Genders.Man, "Programmer", 3000000, myRoom);
-            Console.WriteLine(adam.ToString());
-
+            Employee Kovacs = new Employee("géza", DateTime.Now, 1000, "léhűtő");
+            Kovacs.Room = new Room(111);
+            Employee Kovacs2 = (Employee)Kovacs.Clone();
+            Kovacs2.Room.Number = 112;
+            Console.WriteLine(Kovacs.ToString());
+            Console.WriteLine(Kovacs2.ToString());
             Console.ReadLine();
         }
     }
@@ -46,11 +40,20 @@ namespace CreateClass
         }
     }
 
-    class Employee : Person
+    class Employee : Person, ICloneable
     {
         public string Profession { get; set; }
         public int Salary { get; set; }
+        public Room Room { get; set; }
         public int RoomNumber { get; set; }
+
+        public Employee(string name, DateTime birthday, int salary, string profession)
+        {
+            this.Name = name;
+            this.BirthDate = birthday;
+            this.Salary = salary;
+            this.Profession = profession;
+        }
 
         public Employee(string name, string birthday, Genders gender, string profession, int salary, Room room)
         {
@@ -59,7 +62,8 @@ namespace CreateClass
             this.Gender = gender;
             this.Profession = profession;
             this.Salary = salary;
-            this.RoomNumber = room.RoomNumber;
+            this.Room = room;
+            this.RoomNumber = room.Number;
             this.Age = (DateTime.Now.DayOfYear >= this.BirthDate.DayOfYear) 
                 ? DateTime.Now.Year - this.BirthDate.Year : (DateTime.Now.Year - this.BirthDate.Year) - 1;
         }
@@ -67,12 +71,29 @@ namespace CreateClass
         public override string ToString()
         {
             return string.Format("Name: {0} \nBirth Date: {1} \nAge: {2} \nGender: {3} \nProfession: {4} \nSalary: {5} \nRoom number: {6}"
-                , this.Name, this.BirthDate, this.Age, this.Gender, this.Profession, this.Salary, this.RoomNumber);
+                , this.Name, this.BirthDate, this.Age, this.Gender, this.Profession, this.Salary, this.Room.Number);
+        }
+
+        //public object Clone()
+        //{
+        //    return this.MemberwiseClone();
+        //}
+
+        public object Clone()
+        {
+            Employee newEmployee = (Employee)this.MemberwiseClone();
+            newEmployee.Room = new Room(Room.Number);
+            return newEmployee;
         }
     }
 
     class Room
     {
-        public int RoomNumber { get; set; }
+        public int Number { get; set; }
+
+        public Room(int number)
+        {
+            this.Number = number;
+        }
     }
 }
